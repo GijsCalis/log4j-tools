@@ -108,7 +108,7 @@ public class Main {
     }
 
     private static boolean acceptableFile(String filename) {
-        return filename.endsWith(".jar") || filename.endsWith(".war");
+        return filename.endsWith(".jar") || filename.endsWith(".ear") || filename.endsWith(".sar") || filename.endsWith(".war");
     }
 
     private static void runScan(String root_folder) throws IOException{

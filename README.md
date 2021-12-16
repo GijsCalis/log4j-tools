@@ -40,7 +40,7 @@ The tool requires python3, without additional dependencies.
 python scan_jndimanager_versions.py root-folder
 ```
 
-The tool will scan `root_folder` recursively for `.jar` and `.war` files; in each located file the tool looks for a `*log4j/core/net/JndiManager.class` code (recursively in each `.jar` file). The version of the class is determined using unique string constants ("allowedJndiProtocols", "log4j2.enableJndi") which appeared in this class in versions 2.15 and 2.16.
+The tool will scan `root_folder` recursively for `.jar`, `ear`, `sar` and `.war` files; in each located file the tool looks for a `*log4j/core/net/JndiManager.class` code (recursively in each `.jar` file). The version of the class is determined using unique string constants ("allowedJndiProtocols", "log4j2.enableJndi") which appeared in this class in versions 2.15 and 2.16.
 
 ------
 
@@ -56,7 +56,7 @@ The tool requires java runtime, without additional dependencies.
 java -jar scan_jndimanager_versions.jar root-folder
 ```
 
-The tool will scan `root_folder` recursively for `.jar` and `.war` files; in each located file the tool looks for a `*log4j/core/net/JndiManager.class` code (recursively in each `.jar` file). The version of the class is determined using unique string constants ("allowedJndiProtocols", "log4j2.enableJndi") which appeared in this class in versions 2.15 and 2.16.
+The tool will scan `root_folder` recursively for `.jar`, `ear`, `sar` and `.war` files; in each located file the tool looks for a `*log4j/core/net/JndiManager.class` code (recursively in each `.jar` file). The version of the class is determined using unique string constants ("allowedJndiProtocols", "log4j2.enableJndi") which appeared in this class in versions 2.15 and 2.16.
 
 For both implementations, the results look like this:
 
