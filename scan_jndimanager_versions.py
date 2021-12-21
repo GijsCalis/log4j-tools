@@ -1,8 +1,9 @@
 import os
-import sys
 from enum import Enum, auto
+from optparse import OptionParser
 from typing import IO
 from zipfile import BadZipFile, ZipFile
+
 
 JNDIMANAGER_CLASS_NAME = "log4j/core/net/JndiManager.class"
 JNDILOOKUP_CLASS_NAME = "log4j/core/lookup/JndiLookup.class"
@@ -14,6 +15,8 @@ PATCH_STRING_BACKPORT = b"JNDI is not supported"
 RED = "\x1b[31m"
 GREEN = "\x1b[32m"
 RESET_ALL = "\x1b[0m"
+
+verbose = False
 
 
 class JndiManagerVersion(Enum):
@@ -56,7 +59,8 @@ def test_file(file: IO[bytes], rel_path: str):
     try:
         with ZipFile(file) as jarfile:
             for file_name in jarfile.namelist():
-                if file_name.endswith(".jar"):
+                # Recursively process nested jar files
+                if acceptable_filename(file_name):
                     next_file = jarfile.open(file_name, "r")
                     test_file(next_file, os.path.join(rel_path, file_name))
                     continue
@@ -89,8 +93,15 @@ def run_scanner(root_dir: str):
                 if acceptable_filename(filename):
                     full_path = os.path.join(directory, filename)
                     rel_path = os.path.relpath(full_path, root_dir)
-                    with open(full_path, "rb") as file:
-                        test_file(file, rel_path)
+                    if verbose:
+                        print(rel_path)
+
+                    try:
+                        with open(full_path, "rb") as file:
+                            test_file(file, rel_path)
+                    except FileNotFoundError as fnf_error:
+                        print(fnf_error)
+
     elif os.path.isfile(root_dir):
         if acceptable_filename(root_dir):
             with open(root_dir, "rb") as file:
@@ -98,7 +109,20 @@ def run_scanner(root_dir: str):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print(f"Usage: {sys.argv[0]} <root_folder>")
-        exit()
-    run_scanner(sys.argv[1])
+    usage = "usage: %prog [options] <root_folder>"
+    parser = OptionParser(usage=usage)
+    parser.add_option("-v", "--verbose", action="store_true", dest="verbose", default=False, help="Print all found java archive files")
+    (options, args) = parser.parse_args()
+
+    if len(args) != 1:
+        parser.error("Missing argument for root folder to scan")
+
+    verbose = options.verbose
+
+    root_dir = args[0]
+
+    if not os.path.isdir(root_dir):
+        print("Given directory [" + root_dir + "] does not exist")
+        exit(1)
+
+    run_scanner(root_dir)
