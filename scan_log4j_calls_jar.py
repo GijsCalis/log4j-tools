@@ -216,7 +216,7 @@ def run_scanner(
     # regex for class name filtering
     class_regex="org/apache/logging/log4j/Logger",
     # regex for method name filtering (ignored when looking for existence of classes)
-    method_regex="(info|warn|error|log|debug|trace|fatal)",
+    method_regex="(info|warn|error|log|debug|trace|fatal|catching|throwing|traceEntry|printf|logMessage)",
     # checking for existence of this string in classes unless no_quickmatch
     quickmatch_string="log4j",
     # not set - looking for calls to specified methods, set - looking for existence of classes
@@ -239,11 +239,15 @@ def run_scanner(
     )
 
     for filename in tqdm(files_to_scan):
-        xref_analysis = XrefAnalysis(filename, class_regex, method_regex)
-        if class_existence:
-            print_class_existence(xref_analysis, os.path.relpath(filename, root_dir))
-        else:
-            print_xrefs_analysis(xref_analysis, os.path.relpath(filename, root_dir))
+        try:
+            xref_analysis = XrefAnalysis(filename, class_regex, method_regex)
+            if class_existence:
+                print_class_existence(xref_analysis, os.path.relpath(filename, root_dir))
+            else:
+                print_xrefs_analysis(xref_analysis, os.path.relpath(filename, root_dir))
+        except ValueError as e:
+            tqdm.write(f"Parsing error in {filename}")
+
 
 
 if __name__ == "__main__":

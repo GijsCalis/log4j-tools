@@ -1,7 +1,6 @@
 import os
 import re
-from collections import defaultdict
-from dataclasses import dataclass
+from collections import defaultdict, namedtuple
 from typing import Dict, Set
 
 import easyargs
@@ -21,10 +20,7 @@ from javalang.tree import (
 from tqdm import tqdm
 
 
-@dataclass(frozen=True)
-class CalleeDesc:
-    class_name: str
-    method_name: str
+CalleeDesc = namedtuple("CalleeDesc", ["class_name", "method_name"])
 
 
 def traverse(t, visitor):
@@ -181,7 +177,7 @@ def traverse_folder(root_dir):
 def scan(
     root_dir,
     class_regex=r"org.apache.logging.log4j.Logger",
-    method_regex="(info|warn|error|log|debug|trace|fatal)",
+    method_regex="(info|warn|error|log|debug|trace|fatal|catching|throwing|traceEntry|printf|logMessage)",
 ):
     parsing_failed_files = []
     for filename in tqdm(list(traverse_folder(root_dir))):
